@@ -38,7 +38,7 @@ void setupSDCard();
 
 void printIMU();
 void printRTC();
-void displayOnOLED(const char str[]);
+void displayOnOLED(const char str[], const uint32_t sampling_freq);
 void writeToSDCard();
 
 /* Global Vars */
@@ -74,7 +74,7 @@ void setup() {
   setupIMU();
   setupRTC();
   setupOLED();
-  // setupSDCard();
+  setupSDCard();
 }
 
 
@@ -155,6 +155,12 @@ void loop() {
   // listen for Bluetooth® Low Energy peripherals to connect:
   BLEDevice central = BLE.central();
 
+  // Mode we are in
+  uint8_t mode = 1;
+
+  // Sampling Freq
+  uint32_t sampling_freq = 1000;
+
   // if a central is connected to peripheral:
   if (central) {
     Serial.print("Connected to central: ");
@@ -168,27 +174,33 @@ void loop() {
       // use the value to control the LED:
       if (switchCharacteristic.written()) {
 
-        printIMU();
-        printRTC();
-
         if (switchCharacteristic.value()) {  // any value other than 0
           digitalWrite(ledPin, LOW);         // will turn the LED on
 
-          displayOnOLED("MODE -");
+          displayOnOLED("MODE -", sampling_freq);
+
+          mode = 1;
         } else {                       // a 0 value
           digitalWrite(ledPin, HIGH);  // will turn the LED off
 
-          displayOnOLED("MODE");
+          displayOnOLED("MODE", sampling_freq);
 
-          Serial.println("Writing to SD Card");
-          writeToSDCard();
+          mode = 0;
         }
 
         Serial.println();
         Serial.println();
       }
 
-      delay(1000);
+      printIMU();
+      printRTC();
+
+      if (mode == 0) {
+        Serial.println("Writing to SD Card");
+        writeToSDCard();
+      }
+
+      delay(sampling_freq);
     }
 
     // when the central disconnects, print it out:
@@ -244,26 +256,42 @@ void printRTC() {
 }
 
 /* Displays str to screen */
-void displayOnOLED(const char str[]) {
+void displayOnOLED(const char str[], const uint32_t sampling_freq) {
+  String sample_freq_str = "Rate(ms): ";
+  sample_freq_str += sampling_freq;
+  
   u8x8.setFont(u8x8_font_chroma48medium8_r);  //try u8x8_font_px437wyse700a_2x2_r
   u8x8.setCursor(0, 0);                       // It will start printing from (0,0) location
   u8x8.print(str);
+  u8x8.setCursor(0, 1);                       // It will start printing from (0,0) location
+  u8x8.print(sample_freq_str);
 }
 
 /* Write data to SD Card*/
 void writeToSDCard(void) {
+  Time nowTime = pcf.getTime();  //get current time
   // make a string for assembling the data to log:
   String dataString = "";
 
-  int numSensors = 1;
-  // read numSensors sensors and append to the string:
-  for (int analogPin = 0; analogPin < numSensors; analogPin++) {
-    int sensor = analogRead(analogPin);
-    dataString += String(sensor);
-    if (analogPin < numSensors) {
-      dataString += ",";
-    }
-  }
+  dataString += nowTime.hour;
+  dataString += ",";
+  dataString += nowTime.minute;
+  dataString += ",";
+  dataString += nowTime.second;
+  dataString += ",";
+  dataString += myIMU.readFloatAccelX();
+  dataString += ",";
+  dataString += myIMU.readFloatAccelY();
+  dataString += ",";
+  dataString += myIMU.readFloatAccelZ();
+  dataString += ",";
+  dataString += myIMU.readFloatGyroX();
+  dataString += ",";
+  dataString += myIMU.readFloatGyroY();
+  dataString += ",";
+  dataString += myIMU.readFloatGyroZ();
+  dataString += ",";
+  dataString += myIMU.readTempF();
 
   // open the file. note that only one file can be open at a time,
   // so you have to close this one before opening another.

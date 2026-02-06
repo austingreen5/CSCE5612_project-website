@@ -1,0 +1,11 @@
+,No Logging,Logging
+Vusb (V),5.130,5.120
+Iusb (A),0.050,0.020
+Pusb (W),0.257,0.102
+Ibat_avg (I),0.082,0.033
+t (h),6.131,15.356
+,,
+I_delt (A),-0.030,
+P_delt (W),-0.154,
+,,
+For some reason it appears that writing to the SD card uses less power on average. This has been the case over multiple attempts. My only guess is that it is because reading from the IMU uses more energy than writing to the SD card.,,
