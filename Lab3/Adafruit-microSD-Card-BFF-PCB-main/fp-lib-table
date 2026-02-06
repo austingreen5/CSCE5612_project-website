@@ -1,0 +1,4 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "Adafruit microSD BFF")(type "KiCad")(uri "$(KIPRJMOD)/Adafruit microSD BFF.pretty")(options "")(descr ""))
+)
