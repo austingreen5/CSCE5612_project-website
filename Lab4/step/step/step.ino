@@ -66,7 +66,7 @@ void setup() {
     while (1) {}
   }
 
-  BLE.setLocalName("StepCounter");
+  BLE.setLocalName("StepCounter-AG");
   BLE.setAdvertisedService(stepService);
 
   stepService.addCharacteristic(stepCountChar);
