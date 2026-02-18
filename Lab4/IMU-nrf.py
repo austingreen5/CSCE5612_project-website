@@ -1,10 +1,11 @@
+
 import asyncio
 from datetime import datetime
 from bleak import BleakClient, BleakScanner
 
 # ---------- CONFIG ----------
-TARGET_NAME = "XIAO_IMU_EVT_AG"  # <-- ONLY change this to match BLE.setLocalName(...)
-TARGET_SERVICE_UUID = "12345678-1234-5678-1234-56789abcdef0"  # optional filter (recommended)
+TARGET_NAME = "Austin" # <-- ONLY change this to match BLE.setLocalName(...)
+TARGET_SERVICE_UUID = "2AA846A1-29D3-FE8A-59FC-ACD670A1D600" # optional ﬁlter (recommended)
 CHAR_UUID = "12345678-1234-5678-1234-56789abcdef1"
 CSV_PATH = "punch.csv"
 SCAN_TIMEOUT = 8.0
@@ -100,4 +101,4 @@ if __name__ == "__main__":
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
-        print("\nStopped.")
+        print("\nStopped.") 
